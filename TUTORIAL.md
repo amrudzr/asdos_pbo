@@ -44,23 +44,18 @@ Sistem akan meminta folder tempat kamu menyimpan seluruh arsip tugas mahasiswa (
 2. Sistem akan secara otomatis membongkar seluruh isi file mahasiswa tersebut ke dalam folder sementara (temp) dan membaca **NIM mahasiswa dari nama file**. 
 *(Tips: Kosongkan dan langsung tekan Enter jika kamu ingin mengecek NIM dan tugas secara manual satu-per-satu).*
 
-### Tahap 3: Penilaian dan Pengumpulan Waktu Kumpul
+### Tahap 3: Penilaian Otomatis & Pengumpulan Waktu Kumpul
 Sistem sekarang akan memandumu menilai secara otomatis (batch) per NIM yang berhasil diekstrak:
-1. **Waktu Pengumpulan**: Masukkan waktu kapan mahasiswa tersebut mengumpulkan tugas, dengan format yang sama seperti saat memasukkan deadline.
+1. **Waktu Pengumpulan**: Masukkan waktu kapan mahasiswa tersebut mengumpulkan tugas.
 2. *Jika kamu ingin melewati mahasiswa tertentu atau berhenti menilai, ketik huruf `q` dan tekan Enter.*
+3. **Validasi & Penilaian Cerdas**: Setelah memasukkan waktu kumpul, sistem secara otomatis akan melakukan:
+   - **Cek Keterlambatan**: Jika telat lebih dari 4 minggu, kamu akan dimintai konfirmasi.
+   - **Status Compile**: Menguji file Java. Jika gagal/error, nilai dasar menjadi 0.
+   - **Validasi Aset Greenfoot**: Menghitung ketersediaan gambar dan suara yang dipakai oleh mahasiswa di kodenya.
+   - **Pengecekan Plagiarisme Global**: Kode mahasiswa akan dicocokkan dengan **semua mahasiswa lain**. Jika terdeteksi kemiripan (di atas 80% non-template), sistem akan menandainya plagiat, menampilkan nilai kemiripannya, serta mencetak *highlight* bagian mana saja yang mirip! (Tidak ada lagi pertanyaan manual jika kamu menggunakan input folder otomatis).
+   - **Deteksi Improvisasi**: Membaca otomatis apakah terdapat komentar dokumentasi/improvisasi yang layak mendapat skor bonus (95).
 
-### Tahap 4: Konfirmasi Penilaian
-Berdasarkan waktu kumpul, sistem akan otomatis menghitung keterlambatan. Jika terlambat, nilai akan dikurangi 1 poin per minggu.
-1. **Peringatan Keterlambatan**: 
-   *Contoh: Jika mahasiswa telat lebih dari 4 minggu, sistem akan memunculkan peringatan berwarna kuning. Ketik `y` jika kamu ingin lanjut menilai, atau `n` untuk membatalkan input anak tersebut.*
-2. **Status Compile**: Sistem akan secara otomatis menguji coba file program (auto-compile) menggunakan Java (`javac`).
-   - Kamu akan diminta memasukkan lokasi (path) folder tugas mahasiswa tersebut (secara default akan merujuk ke folder `submissions/[NIM]`).
-   - Sistem akan mengecek semua file `.java` di dalam folder tersebut dan melakukan kompilasi. Jika gagal atau *error*, otomatis nilainya menjadi 0.
-3. **Plagiarisme**: Jika program berhasil di-compile, sistem akan bertanya lagi, "Apakah terdeteksi plagiat (kemiripan > 80%)?".
-   - Ketik `y` jika anak tersebut mencontek. (Otomatis nilai tertingginya dibatasi menjadi 69).
-   - Ketik `n` jika karya orisinil.
-
-Setelah semua pertanyaan dijawab, layar akan menampilkan teks **"Data ditambahkan!"** berwarna hijau, dan kamu bisa lanjut ke mahasiswa berikutnya.
+Setelah proses per mahasiswa selesai, layar akan menampilkan teks **"Data ditambahkan!"** berwarna hijau, dan kamu bisa lanjut ke mahasiswa berikutnya.
 
 ---
 
@@ -69,9 +64,11 @@ Setelah semua pertanyaan dijawab, layar akan menampilkan teks **"Data ditambahka
 Jika kamu sudah selesai memasukkan nilai seluruh mahasiswa (dengan mengetik `q` pada isian NIM), sistem akan menampilkan **Hasil Rekapitulasi** dalam bentuk tabel yang rapi di layar.
 
 1. Setelah tabel muncul, sistem akan bertanya: "Apakah Anda ingin mengekspor data ke CSV?"
-2. Ketik `y` lalu tekan **Enter** untuk menyimpan.
-3. File akan tersimpan dengan nama **report_nilai.csv** di dalam folder yang sama dengan aplikasi. 
-4. File CSV ini bisa kamu buka dengan mudah menggunakan Microsoft Excel atau Google Sheets.
+2. Ketik `y` lalu tekan **Enter** untuk menyimpan nilai ke dalam file `report_nilai.csv`.
+3. Setelah itu, sistem akan bertanya lagi: **"Apakah Anda ingin mengupdate file Excel Master?"**
+   - Ketik `y` jika kamu sudah menyiapkan file `.env` (lihat file `.env.example`).
+   - Masukkan **nama kolom tugas** di file Excel tersebut (misalnya `nama tugas 1`).
+   - Nilai akhir mahasiswa akan secara ajaib **langsung masuk ke sel Excel** yang bersesuaian dengan NIM masing-masing di dalam Sheet 2! (Pastikan file Excel sedang tidak dibuka).
 
 ---
 

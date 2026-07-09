@@ -213,3 +213,96 @@ def generate_plagiarism_report(data: List[Dict[str, Any]]) -> None:
             console.print(recap_table)
             console.print("=====")
 
+def update_master_excel(data: List[Dict[str, Any]], task_col_name: str) -> bool:
+    """
+    Update the master Excel file with the evaluation data.
+    Reads EXCEL_PATH from .env
+    """
+    import os
+    from rich.console import Console
+    console = Console()
+    
+    excel_path = None
+    env_path = ".env"
+    if os.path.exists(env_path):
+        with open(env_path, "r", encoding="utf-8") as f:
+            for line in f:
+                if line.strip().startswith("EXCEL_PATH="):
+                    excel_path = line.strip().split('=', 1)[1].strip('"\'')
+                    break
+                    
+    if not excel_path or not os.path.exists(excel_path):
+        console.print("[bold red]Path Excel tidak ditemukan di .env atau file tidak ada![/bold red]")
+        return False
+        
+    try:
+        from openpyxl import load_workbook
+        wb = load_workbook(excel_path)
+        if len(wb.worksheets) < 2:
+            console.print("[bold red]File Excel tidak memiliki Sheet 2![/bold red]")
+            return False
+            
+        ws = wb.worksheets[1] # Sheet 2
+        
+        # Find header row (search first 10 rows)
+        header_row_idx = -1
+        nim_col_idx = -1
+        task_col_idx = -1
+        
+        for r_idx, row in enumerate(ws.iter_rows(min_row=1, max_row=10, values_only=True), 1):
+            if row and "NIM" in row:
+                header_row_idx = r_idx
+                nim_col_idx = row.index("NIM") + 1
+                if task_col_name in row:
+                    task_col_idx = row.index(task_col_name) + 1
+                break
+                
+        if header_row_idx == -1:
+            console.print("[bold red]Header 'NIM' tidak ditemukan di Excel![/bold red]")
+            return False
+            
+        if task_col_idx == -1:
+            console.print(f"[bold yellow]Kolom '{task_col_name}' tidak ditemukan, akan ditambahkan di kolom baru![/bold yellow]")
+            # Find first empty column in header row
+            max_col = ws.max_column
+            for c_idx in range(1, max_col + 2):
+                if ws.cell(row=header_row_idx, column=c_idx).value is None:
+                    task_col_idx = c_idx
+                    ws.cell(row=header_row_idx, column=task_col_idx).value = task_col_name
+                    break
+                    
+        # Update data
+        updated_count = 0
+        not_found = []
+        
+        for result in data:
+            nim = result.get("nim")
+            score = result.get("final_score")
+            
+            # Find NIM in excel
+            found = False
+            for r_idx in range(header_row_idx + 1, ws.max_row + 1):
+                cell_value = ws.cell(row=r_idx, column=nim_col_idx).value
+                if cell_value and str(cell_value).strip().upper() == str(nim).strip().upper():
+                    ws.cell(row=r_idx, column=task_col_idx).value = score
+                    found = True
+                    updated_count += 1
+                    break
+            if not found:
+                not_found.append(nim)
+                
+        wb.save(excel_path)
+        console.print(f"[bold green]Berhasil mengupdate {updated_count} data ke Excel {excel_path}[/bold green]")
+        if not_found:
+            console.print(f"[bold yellow]NIM berikut tidak ditemukan di Excel: {', '.join(not_found)}[/bold yellow]")
+        return True
+        
+    except ImportError:
+        console.print("[bold yellow]Library 'openpyxl' tidak ditemukan. Gagal mengupdate Excel.[/bold yellow]")
+        return False
+    except PermissionError:
+        console.print(f"[bold red]Gagal menyimpan! Pastikan file Excel tidak sedang dibuka: {excel_path}[/bold red]")
+        return False
+    except Exception as e:
+        console.print(f"[bold red]Gagal mengupdate file Excel: {e}[/bold red]")
+        return False

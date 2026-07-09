@@ -5,10 +5,11 @@ Proyek ini adalah sistem otomatisasi penilaian dan pendeteksi plagiasi yang dira
 ## ✨ Fitur Utama
 
 - **Ekstraksi Otomatis**: Mendukung dan dapat membongkar format file `.zip`, `.greenfoot`, dan `.gfar` (Greenfoot Archive) secara otomatis.
-- **Validasi Aset Greenfoot**: Melakukan pengecekan ketersediaan aset gambar (`images/`) dan suara (`sounds/`) yang wajib ada pada proyek game/aplikasi mahasiswa.
-- **Deteksi Plagiasi Struktur (AST)**: Menggunakan `javalang` untuk menganalisis Abstract Syntax Tree (AST) sehingga dapat mendeteksi plagiarisme struktural dengan tingkat akurasi tinggi, bahkan ketika nama variabel atau komentar telah diubah.
+- **Validasi Aset Greenfoot Otomatis**: Melakukan pengecekan ketersediaan aset gambar (`images/`) dan suara (`sounds/`) yang wajib ada pada proyek game/aplikasi mahasiswa.
+- **Deteksi Plagiasi Struktur (AST) Global**: Menggunakan `javalang` untuk menganalisis Abstract Syntax Tree (AST) secara otomatis (batch) terhadap seluruh tugas mahasiswa. Sistem dapat mendeteksi plagiarisme struktural dan menyoroti (*highlight*) bagian kode yang mirip, sambil memisahkan mana yang sekadar template dasar dosen (boilerplate).
+- **Deteksi Komentar & Improvisasi Otomatis**: Secara cerdas menganalisis *source code* mahasiswa untuk mengecek ada tidaknya dokumentasi/komentar penjelasan yang menjadi poin tambahan.
 - **Tabel Pelaporan Interaktif (Rich)**: Menampilkan antarmuka laporan penilaian dan rekap detail plagiasi secara visual menggunakan tabel di dalam CLI/Terminal.
-- **Ekspor CSV**: Menghasilkan output nilai akhir (beserta indikasi pelanggaran aturan format atau plagiasi) ke dalam file `.csv` (`report_nilai.csv`) untuk diinput dengan mudah ke portal akademik.
+- **Integrasi Langsung ke Excel Master**: Menghasilkan output nilai akhir yang bisa langsung diinput ke dalam *Sheet* khusus pada file Excel rekapitulasi penilaian utama, dikonfigurasi secara fleksibel melalui file `.env`. (Ekspor `.csv` standar tetap tersedia).
 
 ## 📋 Prasyarat Sistem
 
@@ -49,7 +50,11 @@ Disarankan untuk menggunakan *Virtual Environment* agar dependensi atau library 
    ```bash
    pip install -r requirements.txt
    ```
-   *Library utama yang akan diinstal meliputi `rich` (untuk UI CLI), `javalang` (untuk AST parser), dan `openpyxl` (jika dibutuhkan untuk Excel).*
+   *Library utama yang akan diinstal meliputi `rich` (untuk UI CLI), `javalang` (untuk AST parser), dan `openpyxl` (untuk integrasi Excel).*
+
+5. **Konfigurasi Path Excel (Opsional, jika butuh auto-input nilai)**:
+   - Duplikat file `.env.example` dan ubah namanya menjadi `.env`.
+   - Buka file `.env` tersebut dan ubah nilai `EXCEL_PATH` sesuai dengan lokasi file Excel tempat Anda merekap nilai (misalnya: `C:\Users\Nama\Documents\tugas.xlsx`).
 
 ## 🚀 Cara Penggunaan
 
@@ -67,7 +72,7 @@ Disarankan untuk menggunakan *Virtual Environment* agar dependensi atau library 
    Saat selesai, ia akan memunculkan "Laporan Detail Plagiarisme" dan "Laporan Hasil Penilaian Tugas PBO".
    
 4. **Ekspor Hasil**:
-   Pada langkah terakhir eksekusi, Anda akan ditanya apakah ingin mengekspor data tersebut ke dalam file CSV (tekan `y`). Anda akan mendapati laporan tersimpan di file `report_nilai.csv`.
+   Pada langkah terakhir eksekusi, Anda akan ditanya apakah ingin mengekspor data tersebut ke dalam file CSV (tekan `y`). Selanjutnya, sistem juga akan menanyakan apakah Anda ingin mengupdate **file Excel Master** secara otomatis. Jika iya, Anda hanya perlu mengetikkan nama kolom tugas (misal: `nama tugas 1`), dan sistem akan mengisi nilai akhir secara presisi berdasarkan NIM mahasiswa.
 
 ## 📚 Pelajari Lebih Lanjut
 Apabila Anda butuh memodifikasi _scoring logic_ atau aturan penilaian (seperti bobot skor `95` untuk penambahan komentar improvisasi atau `78` untuk format yang salah), Anda dapat memeriksa atau memodifikasi `main.py` dan `src/plagiarism.py`. Anda juga bisa membaca file [TUTORIAL.md](./TUTORIAL.md) untuk mempelajari struktur detail jika tersedia panduan ekstraksi.

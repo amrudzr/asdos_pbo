@@ -193,6 +193,13 @@ def main():
         if export:
             export_to_csv(results)
             
+        update_excel = Confirm.ask("Apakah Anda ingin mengupdate file Excel Master?")
+        if update_excel:
+            from src.reporter import update_master_excel
+            col_name = Prompt.ask("Masukkan nama kolom tugas di Excel (misal: 'nama tugas 1')")
+            update_master_excel(results, col_name)
+
+            
     # Cleanup dummy temp dir
     cleanup_temp_dir("temp")
 
